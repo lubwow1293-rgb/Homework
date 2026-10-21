@@ -30,7 +30,7 @@ def get_mask_card_number(card_number: str) -> str:
 
 def get_mask_account(account_number: str) -> str:
     """
-    Принимает номер счета в виде строки и возвращает его маску в формате **XXXX .
+    Принимает номер счета в виде строки и возвращает его маску в формате **XXXX.
     """
     # Убираем возможные пробелы по краям
     account_number = account_number.strip()
