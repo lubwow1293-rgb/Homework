@@ -1,3 +1,5 @@
+from datetime import datetime
+
 """
 Функция маскировки номера банковского счета или карты
 """
@@ -25,3 +27,24 @@ def mask_account_card(card_or_account_string):
 
         # Возвращаем результат с сохранением оригинального названия карты
         return f"{parts[0]} {masked_digits.strip()}"
+
+
+"""
+Функция получения времени
+"""
+
+
+def get_date(date_str):
+    """
+    Функция принимает строку с датой в формате "YYYY-MM-DDTHH:mm:ss.SSSSSS"
+    и возвращает её в формате "DD.MM.YYYY".
+
+    Пример использования:
+    >>> get_date("2024-03-11T02:26:18.671407")
+    '11.03.2024'
+    """
+    # Парсим строку в объект datetime
+    parsed_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
+
+    # Возвращаем форматированную строку
+    return parsed_date.strftime("%d.%m.%Y")
