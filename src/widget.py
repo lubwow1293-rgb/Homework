@@ -1,47 +1,37 @@
+import re
 from datetime import datetime
-
-"""
-Функция маскировки номера банковского счета или карты
-"""
+from masks import get_mask_card_number, get_mask_account
 
 
-def mask_account_card(card_or_account_string):
-    # Проверяем, является ли входящая строка счётом
-    if card_or_account_string.startswith("Счет"):
-        # Маскируем счёт: оставляем последние 3 цифры
-        prefix = "Счет "
-        number_part = card_or_account_string[len(prefix) :]
-        masked_number = "*" * (len(number_part) - 3) + number_part[-3:]
-        return f"{prefix}{masked_number}"
+def mask_account_card(input_string: str) -> str:
+    """
+    Принимает строку вида "Тип карты/счета Номер",
+    определяет тип данных и применяет соответствующую маску,
+    используя функции из модуля masks.py.
+    """
+    # Находим первую цифру, чтобы отделить тип от номера
+    match = re.search(r'\d', input_string)
 
-    # Обрабатываем карту
+    if not match:
+        raise ValueError("В строке не найден номер карты или счета")
+
+    # Разделяем строку
+    type_part = input_string[:match.start()].strip()
+    number_part = input_string[match.start():].strip()
+
+    # Делегируем маскировку функциям из masks.py
+    if 'счет' in type_part.lower():
+        masked_number = get_mask_account(number_part)
     else:
-        # Разделяем строку по первому пробелу, чтобы отделить название от цифр
-        parts = card_or_account_string.split(maxsplit=1)
+        masked_number = get_mask_card_number(number_part)
 
-        # Берём только те символы, которые являются цифрами
-        digits_only = "".join(c for c in parts[1] if c.isdigit())
-
-        # Формируем маску вида **** **** **** #### (последние 4 цифры)
-        masked_digits = "*" * len(digits_only[:-4]) + " " + digits_only[-4:]
-
-        # Возвращаем результат с сохранением оригинального названия карты
-        return f"{parts[0]} {masked_digits.strip()}"
+    return f"{type_part} {masked_number}"
 
 
-"""
-Функция получения времени
-"""
-
-
-def get_date(date_str):
+def get_date(date_str: str) -> str:
     """
     Функция принимает строку с датой в формате "YYYY-MM-DDTHH:mm:ss.SSSSSS"
     и возвращает её в формате "DD.MM.YYYY".
-
-    Пример использования:
-    >>> get_date("2024-03-11T02:26:18.671407")
-    '11.03.2024'
     """
     # Парсим строку в объект datetime
     parsed_date = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
